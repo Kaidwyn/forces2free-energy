@@ -1,0 +1,43 @@
+[project]
+name = "forces2free"
+version = "0.1.0"
+description = "From forces to free energy: benchmarking universal ML interatomic potentials for crystal thermodynamics against experiment"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "ase>=3.25",
+    "phonopy>=4.6",
+    "seekpath>=2.1",
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "pyyaml>=6.0",
+    "torch>=2.10,<2.15",
+    "mace-torch>=0.3.16",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+# CUDA 12.6 build of PyTorch (RTX 40 series). uv falls back to PyPI for everything else.
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["mlip: slow tests that download and run an ML potential (run with: uv run pytest -m mlip)"]
+addopts = "-m 'not mlip'"
+filterwarnings = [
+    # ase 3.29 sets ndarray.shape, deprecated in numpy 2.5; harmless upstream issue
+    "ignore:Setting the shape on a NumPy array has been deprecated:DeprecationWarning",
+]
