@@ -47,6 +47,10 @@ def parse(text: str) -> pd.DataFrame:
     "CRYSTAL <--> LIQUID" in place of the formation columns. That row holds
     the values of the lower phase at the transition temperature; `phase`
     counts phases from 0 and increases after it.
+
+    Some rows above a transition pack several numbers into one field
+    (Al-002 at 1000 K: "10.585 0.760  0.040"); they end up as notes with NaN
+    values, which does not matter because only phase 0 is used.
     """
     rows = []
     phase = 0

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ import yaml
 from ase import Atoms
 from ase.build import bulk
 from ase.formula import Formula
+from ase.spacegroup import crystal
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIGS = ROOT / "configs"
@@ -26,7 +28,8 @@ class Material:
     structure: dict[str, Any]
     supercell: tuple[int, int, int]
     janaf: str | None
-    melting_point: float  # K
+    melting_point: float | None  # K, from the JANAF table; None if it decomposes before melting
+    compare_up_to: float | None = None  # K, replaces 0.7 x melting point when set
 
     @property
     def atoms_per_formula(self) -> int:
@@ -34,13 +37,23 @@ class Material:
 
     @property
     def compare_tmax(self) -> float:
-        """Highest temperature compared with experiment, 0.7 x melting point."""
+        """Highest temperature compared with experiment, 0.7 x melting point by default."""
+        if self.compare_up_to is not None:
+            return self.compare_up_to
         return 0.7 * self.melting_point
+
+    @property
+    def curve_tmax(self) -> float:
+        """Upper end of the computed curves: the melting point, rounded up to 100 K."""
+        top = self.melting_point or self.compare_tmax / 0.7
+        return math.ceil(top / 100) * 100
 
     def build(self) -> Atoms:
         kind = self.structure["kind"]
         if kind == "bulk":
             return bulk(**self.structure["args"])
+        if kind == "crystal":  # from a space group and Wyckoff positions
+            return crystal(**self.structure["args"])
         raise ValueError(f"unknown structure kind {kind!r} for {self.key}")
 
 

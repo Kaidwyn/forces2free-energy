@@ -1,12 +1,17 @@
 # Crystals to compute.
 #
-# structure:     how to build the starting structure. kind "bulk" calls
-#                ase.build.bulk(**args) at roughly the experimental lattice
-#                constant; each model then relaxes it.
-# supercell:     repetitions of that cell used for finite displacements.
-# janaf:         NIST-JANAF table id, data at https://janaf.nist.gov/tables/<id>.txt
-# melting_point: K. Comparisons with experiment stop at 0.7 x melting point,
-#                above which anharmonic effects that phonons miss grow large.
+# structure:      how to build the starting structure. kind "bulk" calls
+#                 ase.build.bulk(**args); kind "crystal" calls
+#                 ase.spacegroup.crystal(**args). Lattice parameters are
+#                 approximate room-temperature values: each model relaxes
+#                 cell and positions, so they only need the right structure type.
+# supercell:      repetitions of that cell used for finite displacements.
+# janaf:          NIST-JANAF table id, data at https://janaf.nist.gov/tables/<id>.txt
+# melting_point:  K, the CRYSTAL <--> LIQUID row of that JANAF table.
+#                 Comparisons with experiment stop at 0.7 x melting point,
+#                 above which anharmonic effects that phonons miss grow large.
+# compare_up_to:  K, replaces 0.7 x melting point for materials whose JANAF
+#                 table lists no melting (they decompose first).
 
 Si:
   name: silicon (diamond)
@@ -17,4 +22,93 @@ Si:
   # 216 atoms: S(298 K) within 0.001 J/(K mol) of 512 atoms (scripts/convergence.py)
   supercell: [3, 3, 3]
   janaf: Si-001
-  melting_point: 1687
+  melting_point: 1685
+
+SiC:
+  name: silicon carbide (3C, zincblende)
+  formula: SiC
+  structure:
+    kind: bulk
+    args: {name: SiC, crystalstructure: zincblende, a: 4.360, cubic: true}
+  supercell: [3, 3, 3]  # 216 atoms
+  janaf: C-101
+  melting_point: null
+  compare_up_to: 1500
+
+AlN:
+  name: aluminum nitride (wurtzite)
+  formula: AlN
+  structure:
+    kind: bulk
+    args: {name: AlN, crystalstructure: wurtzite, a: 3.112, c: 4.982, u: 0.382}
+  supercell: [4, 4, 3]  # 192 atoms
+  janaf: Al-071
+  melting_point: null
+  compare_up_to: 1500
+
+Al:
+  name: aluminum (fcc)
+  formula: Al
+  structure:
+    kind: bulk
+    args: {name: Al, crystalstructure: fcc, a: 4.050, cubic: true}
+  # 256 atoms: S(298 K) within 0.005 J/(K mol) of 500 atoms (scripts/convergence.py)
+  supercell: [4, 4, 4]
+  janaf: Al-002
+  melting_point: 933.45
+
+Mg:
+  name: magnesium (hcp)
+  formula: Mg
+  structure:
+    kind: bulk
+    args: {name: Mg, crystalstructure: hcp, a: 3.209, c: 5.211}
+  supercell: [5, 5, 3]  # 150 atoms
+  janaf: Mg-002
+  melting_point: 923
+
+NaCl:
+  name: sodium chloride (rocksalt)
+  formula: NaCl
+  structure:
+    kind: bulk
+    args: {name: NaCl, crystalstructure: rocksalt, a: 5.640, cubic: true}
+  # 216 atoms: S(298 K) within 0.02 J/(K mol) of 512 atoms (scripts/convergence.py)
+  supercell: [3, 3, 3]
+  janaf: Cl-053
+  melting_point: 1073.8
+
+NaF:
+  name: sodium fluoride (rocksalt)
+  formula: NaF
+  structure:
+    kind: bulk
+    args: {name: NaF, crystalstructure: rocksalt, a: 4.634, cubic: true}
+  supercell: [3, 3, 3]  # 216 atoms
+  janaf: F-033
+  melting_point: 1269
+
+MgO:
+  name: magnesium oxide (rocksalt)
+  formula: MgO
+  structure:
+    kind: bulk
+    args: {name: MgO, crystalstructure: rocksalt, a: 4.212, cubic: true}
+  supercell: [3, 3, 3]  # 216 atoms
+  janaf: Mg-008
+  melting_point: 3105
+
+Al2O3:
+  name: alpha-alumina (corundum)
+  formula: Al2O3
+  structure:
+    kind: crystal
+    args:
+      symbols: [Al, O]
+      basis: [[0, 0, 0.3522], [0.3064, 0, 0.25]]
+      spacegroup: 167
+      cellpar: [4.759, 4.759, 12.991, 90, 90, 120]
+  # 270 atoms from the 30-atom hexagonal cell: S(298 K) within 0.03 J/(K mol) of 540 atoms
+  supercell: [3, 3, 1]
+  janaf: Al-096
+  melting_point: 2327

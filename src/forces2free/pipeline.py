@@ -14,7 +14,6 @@ runs here.
 from __future__ import annotations
 
 import json
-import math
 import time
 from importlib.metadata import version
 from pathlib import Path
@@ -104,8 +103,7 @@ def analyze(
     freqs = phonons.mesh_frequencies(phonon, mesh)
     z = phonons.formula_units(phonon, material.atoms_per_formula)
 
-    t_max = math.ceil(material.melting_point / 100) * 100
-    temperatures = np.union1d(np.arange(0.0, t_max + 1, TEMPERATURE_STEP), [ROOM_TEMPERATURE])
+    temperatures = np.union1d(np.arange(0.0, material.curve_tmax + 1, TEMPERATURE_STEP), [ROOM_TEMPERATURE])
     ours = harmonic_thermo(freqs.frequencies, freqs.weights, temperatures, formula_units=z)
     ref = phonon.run_thermal_properties(temperatures=temperatures, exclude_gamma_acoustic=True)
     table = pd.DataFrame(
