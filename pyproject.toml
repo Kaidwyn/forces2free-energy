@@ -16,6 +16,7 @@ dependencies = [
     "torch>=2.10,<2.15",
     "mace-torch>=0.3.16",
     "orb-models>=0.7",
+    "torch-dftd>=0.5.3",
 ]
 
 [dependency-groups]

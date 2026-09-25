@@ -31,7 +31,11 @@ def load_calculator(model: Model, device: str | None = None) -> Calculator:
             warnings.filterwarnings("ignore", message=".*TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD.*")
             from mace.calculators import mace_mp
 
-            return mace_mp(model=model.checkpoint, device=device, default_dtype="float64")
+            return mace_mp(
+                model=model.checkpoint, device=device, default_dtype="float64", dispersion=model.dispersion
+            )
+    if model.dispersion:
+        raise ValueError(f"dispersion is only implemented for MACE models, not {model.key}")
     if model.family == "orb":
         from orb_models.forcefield import pretrained
         from orb_models.forcefield.inference.calculator import ORBCalculator

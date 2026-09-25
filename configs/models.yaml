@@ -50,3 +50,14 @@ orb-v3-omat:
   training_data: OMat24; conservative forces, unlimited neighbours within 6 A
   functional: PBE/PBE+U
   license: Apache-2.0
+
+# MACE-MP-0 with Grimme D3(BJ) dispersion, as used by Fromsejer et al. (2025). It tests how much of
+# MACE-MP-0's softening comes from its too-large equilibrium volume.
+mace-mp-0-d3:
+  family: mace
+  checkpoint: medium
+  label: MACE-MP-0 + D3
+  training_data: MPtrj (~1.6M structures from Materials Project relaxations)
+  functional: PBE/PBE+U, plus D3(BJ) dispersion
+  license: MIT
+  dispersion: true
