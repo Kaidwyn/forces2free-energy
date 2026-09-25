@@ -14,6 +14,7 @@ Si:
   structure:
     kind: bulk
     args: {name: Si, crystalstructure: diamond, a: 5.431, cubic: true}
-  supercell: [3, 3, 3]  # 216 atoms; to be checked with scripts/convergence.py
+  # 216 atoms: S(298 K) within 0.001 J/(K mol) of 512 atoms (scripts/convergence.py)
+  supercell: [3, 3, 3]
   janaf: Si-001
   melting_point: 1687

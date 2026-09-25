@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import warnings
+
 from ase.calculators.calculator import Calculator
 
 from forces2free.config import Model
@@ -22,7 +24,12 @@ def load_calculator(model: Model, device: str | None = None) -> Calculator:
     """
     device = device or default_device()
     if model.family == "mace":
-        from mace.calculators import mace_mp
+        # torch 2.14 flags the TorchScript calls inside e3nn/MACE as deprecated;
+        # they still work, so keep the log readable while importing and loading.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            warnings.filterwarnings("ignore", message=".*TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD.*")
+            from mace.calculators import mace_mp
 
-        return mace_mp(model=model.checkpoint, device=device, default_dtype="float64")
+            return mace_mp(model=model.checkpoint, device=device, default_dtype="float64")
     raise ValueError(f"unknown model family {model.family!r} for {model.key}")
