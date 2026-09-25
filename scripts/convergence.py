@@ -27,18 +27,22 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--model", default="mace-matpes-pbe-0")
     parser.add_argument("--material", default="Si")
+    parser.add_argument("--supercells", nargs="+", metavar="NxMxK",
+                        help="repetitions of the configured cell to try, e.g. 2x2x1 3x3x1")
+    parser.add_argument("--meshes", nargs="+", type=int, default=MESHES)
     args = parser.parse_args()
 
     material = load_materials()[args.material]
     calc = load_calculator(load_models()[args.model])
     relaxed = relax(material.build(), calc).atoms
+    supercells = [tuple(int(n) for n in s.split("x")) for s in args.supercells] if args.supercells else SUPERCELLS
 
     rows = []
-    for supercell in SUPERCELLS:
+    for supercell in supercells:
         phonon, _ = phonons.compute_forces(relaxed, calc, supercell)
         phonons.build_force_constants(phonon)
         z = phonons.formula_units(phonon, material.atoms_per_formula)
-        for n in MESHES:
+        for n in args.meshes:
             freqs = phonons.mesh_frequencies(phonon, (n, n, n))
             t = harmonic_thermo(freqs.frequencies, freqs.weights, TEMPERATURES, formula_units=z)
             row = {"supercell_atoms": len(phonon.supercell), "mesh": n, "min_frequency_THz": freqs.min_frequency}
