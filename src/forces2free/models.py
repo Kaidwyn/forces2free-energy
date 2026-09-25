@@ -32,4 +32,13 @@ def load_calculator(model: Model, device: str | None = None) -> Calculator:
             from mace.calculators import mace_mp
 
             return mace_mp(model=model.checkpoint, device=device, default_dtype="float64")
+    if model.family == "orb":
+        from orb_models.forcefield import pretrained
+        from orb_models.forcefield.inference.calculator import ORBCalculator
+
+        # orb-models 0.7 returns (model, atoms adapter). torch.compile is off
+        # because it needs Triton, which is not available on Windows.
+        loader = getattr(pretrained, model.checkpoint)
+        network, adapter = loader(device=device, precision="float64", compile=False)
+        return ORBCalculator(network, adapter, device=device)
     raise ValueError(f"unknown model family {model.family!r} for {model.key}")

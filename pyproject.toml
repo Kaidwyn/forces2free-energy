@@ -15,6 +15,7 @@ dependencies = [
     "pyyaml>=6.0",
     "torch>=2.10,<2.15",
     "mace-torch>=0.3.16",
+    "orb-models>=0.7",
 ]
 
 [dependency-groups]

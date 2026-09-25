@@ -1,12 +1,15 @@
 # Universal ML interatomic potentials compared in this project.
 #
-# The four MACE models form controlled pairs:
-#   data set:   mace-mp-0 (MPtrj)            vs  mace-omat-0 (OMat24)        same architecture, PBE(+U)
-#   functional: mace-matpes-pbe-0 (PBE)      vs  mace-matpes-r2scan-0        both fine-tuned from
-#               (r2SCAN) on the same MatPES structures, starting from MACE-OMAT-0
+# The models form controlled pairs, each differing mainly in one factor:
+#   training data: mace-mp-0 (MPtrj)      vs  mace-omat-0 (OMat24)     MACE family, PBE(+U)
+#   functional:    mace-matpes-pbe-0      vs  mace-matpes-r2scan-0     both fine-tuned from
+#                  MACE-OMAT-0 on MatPES structures computed with PBE and with r2SCAN
+#   architecture:  mace-omat-0            vs  orb-v3-omat              both trained on OMat24
 #
-# checkpoint: name passed to mace.calculators.mace_mp(model=...), see
-# mace/calculators/foundations_models.py (mace-torch 0.3.16).
+# checkpoint: for MACE, the name passed to mace.calculators.mace_mp(model=...), see
+# mace/calculators/foundations_models.py (mace-torch 0.3.16); for ORB, the loader
+# function in orb_models.forcefield.pretrained (orb-models 0.7.0).
+# The order of the entries fixes each model's colour in the figures.
 
 mace-mp-0:
   family: mace
@@ -39,3 +42,11 @@ mace-matpes-r2scan-0:
   training_data: MACE-OMAT-0 fine-tuned on MatPES-r2SCAN (~390k structures)
   functional: r2SCAN
   license: ASL (academic, non-commercial use only)
+
+orb-v3-omat:
+  family: orb
+  checkpoint: orb_v3_conservative_inf_omat
+  label: ORB-v3-OMAT
+  training_data: OMat24; conservative forces, unlimited neighbours within 6 A
+  functional: PBE/PBE+U
+  license: Apache-2.0
