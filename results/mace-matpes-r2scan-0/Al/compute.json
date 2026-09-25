@@ -1,0 +1,46 @@
+{
+  "model": "mace-matpes-r2scan-0",
+  "material": "Al",
+  "relax": {
+    "converged": true,
+    "steps": 3,
+    "spacegroup": "Fm-3m (225)",
+    "energy_per_atom_eV": -6.72135045222015,
+    "max_force_eV_per_A": 2.259043646590797e-15,
+    "max_stress_GPa": 0.003697909728697806,
+    "cell_lengths_A": [
+      3.9932707265586607,
+      3.9932707265586607,
+      3.9932707265586607
+    ],
+    "cell_angles_deg": [
+      90.0,
+      90.0,
+      90.0
+    ],
+    "volume_per_atom_A3": 15.919384491886438
+  },
+  "phonons": {
+    "supercell": [
+      4,
+      4,
+      4
+    ],
+    "supercell_atoms": 256,
+    "displacements": 1,
+    "displacement_A": 0.01,
+    "residual_force_eV_per_A": 1.037674770425178e-14
+  },
+  "time_s": {
+    "relax": 0.2371036999975331,
+    "forces": 3.438880000001518
+  },
+  "device": "cuda",
+  "versions": {
+    "phonopy": "4.6.0",
+    "ase": "3.29.0",
+    "torch": "2.14.0+cu126",
+    "mace-torch": "0.3.16",
+    "numpy": "2.5.3"
+  }
+}

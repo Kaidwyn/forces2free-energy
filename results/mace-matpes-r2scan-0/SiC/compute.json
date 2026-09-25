@@ -1,0 +1,46 @@
+{
+  "model": "mace-matpes-r2scan-0",
+  "material": "SiC",
+  "relax": {
+    "converged": true,
+    "steps": 2,
+    "spacegroup": "F-43m (216)",
+    "energy_per_atom_eV": -9.655656639956558,
+    "max_force_eV_per_A": 9.13703926972223e-15,
+    "max_stress_GPa": 0.0002785804477018967,
+    "cell_lengths_A": [
+      4.361397922616475,
+      4.361397922616475,
+      4.361397922616475
+    ],
+    "cell_angles_deg": [
+      90.0,
+      90.0,
+      90.0
+    ],
+    "volume_per_atom_A3": 10.370200426602077
+  },
+  "phonons": {
+    "supercell": [
+      3,
+      3,
+      3
+    ],
+    "supercell_atoms": 216,
+    "displacements": 2,
+    "displacement_A": 0.01,
+    "residual_force_eV_per_A": 5.634208377625072e-14
+  },
+  "time_s": {
+    "relax": 0.4982710999902338,
+    "forces": 3.066621200006921
+  },
+  "device": "cuda",
+  "versions": {
+    "phonopy": "4.6.0",
+    "ase": "3.29.0",
+    "torch": "2.14.0+cu126",
+    "mace-torch": "0.3.16",
+    "numpy": "2.5.3"
+  }
+}

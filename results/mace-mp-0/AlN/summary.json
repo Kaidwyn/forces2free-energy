@@ -1,0 +1,30 @@
+{
+  "model": "mace-mp-0",
+  "material": "AlN",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 2,
+  "max_frequency_THz": 20.222828865867275,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 16.078234532547707,
+  "S_298_J_K_mol": 25.3209905132853,
+  "Cv_298_J_K_mol": 33.874599093279905,
+  "phonopy_max_rel_diff": 3.6864998431213838e-06,
+  "janaf": {
+    "table": "Al-071",
+    "temperature_range_K": [
+      100.0,
+      1500.0
+    ],
+    "S_298_exp": 20.142,
+    "S_298_err": 5.178990513285299,
+    "Cp_298_exp": 30.097,
+    "Cv_298_vs_Cp_rel_err_pct": 12.551414072099899,
+    "S_mae_J_K_mol": 6.191452078567202,
+    "Cp_mape_pct": 7.685955241797035
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "model": "mace-matpes-pbe-0",
+  "material": "Al2O3",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 2,
+  "max_frequency_THz": 21.723062385248525,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 36.946980162628215,
+  "S_298_J_K_mol": 67.43768142807055,
+  "Cv_298_J_K_mol": 89.77438040968558,
+  "phonopy_max_rel_diff": 3.7477247762149077e-06,
+  "janaf": {
+    "table": "Al-096",
+    "temperature_range_K": [
+      100.0,
+      1600.0
+    ],
+    "S_298_exp": 50.95,
+    "S_298_err": 16.487681428070545,
+    "Cp_298_exp": 79.015,
+    "Cv_298_vs_Cp_rel_err_pct": 13.616883388831958,
+    "S_mae_J_K_mol": 17.699608166881895,
+    "Cp_mape_pct": 10.092531929842167
+  }
+}

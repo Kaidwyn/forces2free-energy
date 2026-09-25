@@ -1,0 +1,30 @@
+{
+  "model": "orb-v3-omat",
+  "material": "AlN",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 2,
+  "max_frequency_THz": 25.61817300715479,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 18.167451059494393,
+  "S_298_J_K_mol": 21.323581069717697,
+  "Cv_298_J_K_mol": 30.93957337483167,
+  "phonopy_max_rel_diff": 3.696927496013249e-06,
+  "janaf": {
+    "table": "Al-071",
+    "temperature_range_K": [
+      100.0,
+      1500.0
+    ],
+    "S_298_exp": 20.142,
+    "S_298_err": 1.1815810697176978,
+    "Cp_298_exp": 30.097,
+    "Cv_298_vs_Cp_rel_err_pct": 2.799526115000406,
+    "S_mae_J_K_mol": 1.2102257282378361,
+    "Cp_mape_pct": 2.9168769742341882
+  }
+}

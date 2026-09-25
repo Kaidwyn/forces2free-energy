@@ -1,0 +1,30 @@
+{
+  "model": "mace-omat-0",
+  "material": "Mg",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 2,
+  "max_frequency_THz": 7.48495773728914,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 3.0594413767631288,
+  "S_298_J_K_mol": 31.654193849958666,
+  "Cv_298_J_K_mol": 23.496198097959027,
+  "phonopy_max_rel_diff": 3.561999535469152e-06,
+  "janaf": {
+    "table": "Mg-002",
+    "temperature_range_K": [
+      100.0,
+      600.0
+    ],
+    "S_298_exp": 32.671,
+    "S_298_err": -1.016806150041333,
+    "Cp_298_exp": 24.869,
+    "Cv_298_vs_Cp_rel_err_pct": -5.520133105637425,
+    "S_mae_J_K_mol": 1.2823240837804541,
+    "Cp_mape_pct": 6.744869923293193
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "model": "orb-v3-omat",
+  "material": "NaCl",
+  "relax": {
+    "converged": true,
+    "steps": 3,
+    "spacegroup": "Fm-3m (225)",
+    "energy_per_atom_eV": -3.387845118027293,
+    "max_force_eV_per_A": 6.926500302796242e-05,
+    "max_stress_GPa": 0.0011317617229751743,
+    "cell_lengths_A": [
+      5.6912408755264785,
+      5.6912408755264785,
+      5.6912408755264785
+    ],
+    "cell_angles_deg": [
+      90.0,
+      90.0,
+      90.0
+    ],
+    "volume_per_atom_A3": 23.042569927027294
+  },
+  "phonons": {
+    "supercell": [
+      3,
+      3,
+      3
+    ],
+    "supercell_atoms": 216,
+    "displacements": 2,
+    "displacement_A": 0.01,
+    "residual_force_eV_per_A": 6.926500302953625e-05
+  },
+  "time_s": {
+    "relax": 0.5089260999957332,
+    "forces": 5.906703800006653
+  },
+  "device": "cuda",
+  "versions": {
+    "phonopy": "4.6.0",
+    "ase": "3.29.0",
+    "torch": "2.14.0+cu126",
+    "mace-torch": "0.3.16",
+    "numpy": "2.5.3"
+  }
+}
