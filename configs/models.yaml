@@ -1,0 +1,41 @@
+# Universal ML interatomic potentials compared in this project.
+#
+# The four MACE models form controlled pairs:
+#   data set:   mace-mp-0 (MPtrj)            vs  mace-omat-0 (OMat24)        same architecture, PBE(+U)
+#   functional: mace-matpes-pbe-0 (PBE)      vs  mace-matpes-r2scan-0        both fine-tuned from
+#               (r2SCAN) on the same MatPES structures, starting from MACE-OMAT-0
+#
+# checkpoint: name passed to mace.calculators.mace_mp(model=...), see
+# mace/calculators/foundations_models.py (mace-torch 0.3.16).
+
+mace-mp-0:
+  family: mace
+  checkpoint: medium
+  label: MACE-MP-0
+  training_data: MPtrj (~1.6M structures from Materials Project relaxations)
+  functional: PBE/PBE+U
+  license: MIT
+
+mace-omat-0:
+  family: mace
+  checkpoint: medium-omat-0
+  label: MACE-OMAT-0
+  training_data: OMat24 (~100M non-equilibrium structures)
+  functional: PBE/PBE+U
+  license: ASL (academic, non-commercial use only)
+
+mace-matpes-pbe-0:
+  family: mace
+  checkpoint: mace-matpes-pbe-0
+  label: MACE-MATPES-PBE-0
+  training_data: MACE-OMAT-0 fine-tuned on MatPES-PBE (~430k structures)
+  functional: PBE
+  license: ASL (academic, non-commercial use only)
+
+mace-matpes-r2scan-0:
+  family: mace
+  checkpoint: mace-matpes-r2scan-0
+  label: MACE-MATPES-r2SCAN-0
+  training_data: MACE-OMAT-0 fine-tuned on MatPES-r2SCAN (~390k structures)
+  functional: r2SCAN
+  license: ASL (academic, non-commercial use only)

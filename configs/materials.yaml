@@ -1,0 +1,19 @@
+# Crystals to compute.
+#
+# structure:     how to build the starting structure. kind "bulk" calls
+#                ase.build.bulk(**args) at roughly the experimental lattice
+#                constant; each model then relaxes it.
+# supercell:     repetitions of that cell used for finite displacements.
+# janaf:         NIST-JANAF table id, data at https://janaf.nist.gov/tables/<id>.txt
+# melting_point: K. Comparisons with experiment stop at 0.7 x melting point,
+#                above which anharmonic effects that phonons miss grow large.
+
+Si:
+  name: silicon (diamond)
+  formula: Si
+  structure:
+    kind: bulk
+    args: {name: Si, crystalstructure: diamond, a: 5.431, cubic: true}
+  supercell: [3, 3, 3]  # 216 atoms; to be checked with scripts/convergence.py
+  janaf: Si-001
+  melting_point: 1687
