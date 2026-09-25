@@ -1,8 +1,12 @@
 # forces2free-energy
 
-**From forces to free energy: benchmarking universal ML interatomic potentials for crystal thermodynamics against experiment**
+**From forces to free energy: phonon thermodynamics of crystals from universal machine-learning interatomic potentials, benchmarked against experiment**
 
-Universal machine-learning interatomic potentials (uMLIPs) promise near-DFT accuracy at a tiny fraction of the cost. Most benchmarks compare them with DFT. This project asks the next question: **how close do their phonon-derived thermodynamic properties (entropy, heat capacity, free energy) come to experiment, and where do the errors come from?**
+Universal machine-learning interatomic potentials (uMLIPs) approach the accuracy of density-functional theory (DFT) at a computational cost several orders of magnitude lower, and are increasingly used to predict phonons and thermal properties. Their benchmarks, however, use DFT as the reference (e.g. Matbench Discovery; Loew et al., 2025), so their agreement with experimental thermodynamic data is less well established.
+
+This project computes harmonic phonons with uMLIPs by the finite-displacement method (phonopy), evaluates the vibrational entropy, heat capacity and Helmholtz free energy from the phonon partition function, and compares them with the NIST-JANAF thermochemical tables. The models are chosen as controlled pairs, so that the effects of the training data and of the exchange–correlation functional can be separated.
+
+For silicon, MACE-MP-0 underestimates the Γ-point optical phonon frequency by 28 %, whereas the three models trained on OMat24 or MatPES data reproduce the experimental entropy at 298 K to within 0.6 J K⁻¹ mol⁻¹.
 
 ```mermaid
 flowchart LR
@@ -22,13 +26,13 @@ flowchart LR
 - [ ] Stage 4: α/β-Sn transition temperature and its sensitivity to energy errors
 - [ ] Stage 5: report
 
-## First results: silicon
+## Results: silicon
 
 ![Silicon phonon dispersion](figures/si_phonons.png)
 
 ![Silicon thermodynamics vs NIST-JANAF](figures/si_thermo_vs_janaf.png)
 
-| Model | a (Å) | Γ optical (THz) | S(298 K) | S − S<sub>exp</sub> | S MAE, 100–1100 K | \|Cv/Cp − 1\|, 100–1100 K |
+| Model | a (Å) | Γ optical (THz) | S(298 K) | S − S<sub>exp</sub> | S MAE, 100–1100 K | Mean \|Cv/Cp − 1\|, 100–1100 K |
 |---|---|---|---|---|---|---|
 | MACE-MP-0 | 5.455 | 11.18 | 24.08 | +5.26 | 5.14 | 9.0 % |
 | MACE-OMAT-0 | 5.424 | 15.08 | 19.36 | +0.54 | 0.37 | 3.8 % |
@@ -36,29 +40,29 @@ flowchart LR
 | MACE-MATPES-r2SCAN-0 | 5.439 | 14.94 | 18.73 | −0.09 | 0.44 | 3.3 % |
 | Experiment | 5.431 | 15.6 (Raman) | 18.82 | | | |
 
-Entropies in J K⁻¹ mol⁻¹. Relaxation plus all phonon forces take 2–4 s per model on a laptop GPU (RTX 4060).
+a: relaxed lattice constant (experiment at room temperature). Γ optical: optical phonon frequency at the Γ point. Entropies in J K⁻¹ mol⁻¹. The relaxation and all force evaluations for the phonons take 2–4 s per model on a laptop GPU (NVIDIA RTX 4060).
 
-- **MACE-MP-0 is strongly softened.** Its Γ optical phonon is 28 % below experiment, which inflates the low-temperature heat capacity (+40 % at 100 K) and the entropy. An independent frozen-phonon fit that uses energies only, no phonopy, gives the same 11.2 THz, so this is the model and not the pipeline. This matches the systematic softening reported by Deng et al. (2025).
-- **Training data matters most.** Same MACE architecture family and functional: moving from MPtrj (MACE-MP-0) to OMat24 (MACE-OMAT-0) cuts the entropy error at 298 K from 5.3 to 0.5 J K⁻¹ mol⁻¹.
-- **The functional shows up as a small, systematic shift.** The two MatPES models start from the same checkpoint and are fine-tuned on MatPES structures computed with each functional; r2SCAN gives stiffer phonons than PBE and lowers S by about 0.3 J K⁻¹ mol⁻¹.
-- **Above ~600 K every model falls below experiment by the same amount.** Harmonic Cv cannot exceed 3R, while measured Cp keeps rising. Estimated from the measured thermal expansion, Cp − Cv = α²BVT is under 1 % for silicon, so most of the gap is anharmonicity. This is a limit of the method, not of the potentials. Stage 3 adds the thermal-expansion part (small for Si, ~10 % for soft or ionic solids at high temperature); what remains after that measures anharmonicity.
+- **MACE-MP-0 shows strong phonon softening.** Its Γ-point optical frequency is 28 % below experiment, which raises the low-temperature heat capacity (+40 % at 100 K) and the entropy. An independent frozen-phonon calculation based on total energies alone, without phonopy, gives the same frequency (11.2 THz), which rules out an error in the workflow. The result is consistent with the systematic softening reported by Deng et al. (2025).
+- **Of the factors tested, the training data have the largest effect.** Within the same architecture family and functional, replacing MPtrj (MACE-MP-0) by OMat24 (MACE-OMAT-0) reduces the entropy error at 298 K from 5.3 to 0.5 J K⁻¹ mol⁻¹.
+- **The exchange–correlation functional causes a smaller, systematic shift.** The two MatPES models are fine-tuned from the same checkpoint on MatPES structures computed with PBE and with r2SCAN. The r2SCAN model gives stiffer phonons and an entropy lower by about 0.3 J K⁻¹ mol⁻¹.
+- **Above about 600 K all models underestimate the heat capacity by nearly the same amount.** The harmonic Cv is bounded by 3R, whereas the measured Cp continues to rise. An estimate from the measured thermal expansion gives Cp − Cv = α²BVT below 1 % for silicon, so most of the deviation is attributed to anharmonicity; it reflects the harmonic approximation rather than the potentials. Stage 3 adds the quasi-harmonic (thermal-expansion) contribution, which is small for Si but about 10 % for soft or ionic solids at high temperature; the remaining difference is a measure of anharmonicity.
 
-## How the numbers are checked
+## Validation
 
-| Check | Where |
+| Check | Location |
 |---|---|
 | Einstein values at x = 1, T → 0 and Dulong–Petit limits | `tests/test_thermo.py` |
 | U = F + TS, S = −∂F/∂T and Cv = ∂U/∂T by finite differences | `tests/test_thermo.py` |
-| Own partition-function code vs phonopy: 1e-10 with phonopy's constants, a few 1e-6 with exact SI constants (phonopy uses CODATA 2006) | `tests/test_phonopy_consistency.py` |
-| phonopy's "per mole of primitive cells" vs our "per mole of formula units" (hcp Cu, Z = 2) | `tests/test_phonopy_consistency.py` |
-| Γ optical mode from an energy-only frozen-phonon fit vs phonopy | `tests/test_mlip_si.py` |
+| Partition-function implementation vs phonopy: agreement to 1e-10 with phonopy's CODATA 2006 constants, to a few 1e-6 with the exact SI 2019 constants | `tests/test_phonopy_consistency.py` |
+| Unit convention: per mole of primitive cells (phonopy) vs per mole of formula units (this project), tested on hcp Cu (Z = 2) | `tests/test_phonopy_consistency.py` |
+| Γ-point optical frequency: frozen-phonon energy fit vs phonopy | `tests/test_mlip_si.py` |
 | Supercell (8 → 512 atoms) and q-mesh (8³ → 40³) convergence | `scripts/convergence.py` |
 
-Fast tests use the EMT potential from ASE and need no GPU: `uv run pytest`. The tests that download and run MACE: `uv run pytest -m mlip`.
+The fast tests use ASE's EMT potential and need no GPU (`uv run pytest`); the tests that download and run a MACE model are selected with `uv run pytest -m mlip`.
 
-## Run it
+## Usage
 
-Needs [uv](https://docs.astral.sh/uv/). The lock file pins every version, including the CUDA 12.6 build of PyTorch.
+Requires [uv](https://docs.astral.sh/uv/). `uv.lock` pins all package versions, including the CUDA 12.6 build of PyTorch.
 
 ```bash
 uv sync                                                  # Python 3.12 environment
@@ -68,7 +72,7 @@ uv run python scripts/convergence.py --model mace-matpes-pbe-0 --material Si
 uv run python scripts/make_figures.py
 ```
 
-Results land in `results/<model>/<material>/`: relaxed structure, `phonopy_params.yaml` (displacements and forces), `thermal_properties.csv`, `comparison_janaf.csv`, `summary.json`.
+Outputs are written to `results/<model>/<material>/`: the relaxed structure, `phonopy_params.yaml` (displacements and forces), `thermal_properties.csv`, `comparison_janaf.csv` and `summary.json`.
 
 ## Models
 
@@ -79,7 +83,7 @@ Results land in `results/<model>/<material>/`: relaxed structure, `phonopy_param
 | MACE-MATPES-PBE-0 | MACE-OMAT-0 fine-tuned on MatPES-PBE | PBE | ASL (academic) |
 | MACE-MATPES-r2SCAN-0 | MACE-OMAT-0 fine-tuned on MatPES-r2SCAN | r2SCAN | ASL (academic) |
 
-The pairs are chosen as controlled comparisons: MP-0 vs OMAT-0 changes only the training data; the two MatPES models change only the DFT functional. Models with conflicting dependencies (MatterSim, SevenNet need e3nn ≥ 0.5; MACE pins 0.4.4) will run the `compute` step in their own environment and hand over `phonopy_params.yaml`.
+The models form controlled pairs: MACE-MP-0 and MACE-OMAT-0 differ mainly in the training data, and the two MatPES models mainly in the DFT functional. Models whose dependencies conflict with MACE (MatterSim and SevenNet require e3nn ≥ 0.5, MACE pins 0.4.4) will run the `compute` step in a separate environment and pass on `phonopy_params.yaml`.
 
 ## Layout
 
