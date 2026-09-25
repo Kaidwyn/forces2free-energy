@@ -1,0 +1,30 @@
+{
+  "model": "mace-omat-0",
+  "material": "SiC",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 1,
+  "max_frequency_THz": 28.47031707876313,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 21.166277264096966,
+  "S_298_J_K_mol": 17.1243979881798,
+  "Cv_298_J_K_mol": 27.036682770735116,
+  "phonopy_max_rel_diff": 5.761714344411967e-06,
+  "janaf": {
+    "table": "C-101",
+    "temperature_range_K": [
+      100.0,
+      1500.0
+    ],
+    "S_298_exp": 16.61,
+    "S_298_err": 0.5143979881798018,
+    "Cp_298_exp": 26.84,
+    "Cv_298_vs_Cp_rel_err_pct": 0.7327972084020695,
+    "S_mae_J_K_mol": 0.4434645842498268,
+    "Cp_mape_pct": 3.225926303289934
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "model": "mace-matpes-pbe-0",
+  "material": "MgO",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 1,
+  "max_frequency_THz": 11.577964310428895,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 9.378081520833407,
+  "S_298_J_K_mol": 43.7724869480148,
+  "Cv_298_J_K_mol": 43.48906385828861,
+  "phonopy_max_rel_diff": 3.914488356334302e-06,
+  "janaf": {
+    "table": "Mg-008",
+    "temperature_range_K": [
+      100.0,
+      2100.0
+    ],
+    "S_298_exp": 26.924,
+    "S_298_err": 16.848486948014802,
+    "Cp_298_exp": 37.106,
+    "Cv_298_vs_Cp_rel_err_pct": 17.202241843067444,
+    "S_mae_J_K_mol": 17.065543297932777,
+    "Cp_mape_pct": 14.641132995519582
+  }
+}

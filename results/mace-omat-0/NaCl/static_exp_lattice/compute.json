@@ -1,0 +1,48 @@
+{
+  "model": "mace-omat-0",
+  "material": "NaCl",
+  "relax": {
+    "mode": "fixed lattice constant 5.565 A",
+    "converged": true,
+    "steps": 0,
+    "spacegroup": "Fm-3m (225)",
+    "energy_per_atom_eV": -3.3765038208688383,
+    "max_force_eV_per_A": 2.012367535562416e-16,
+    "max_stress_GPa": 1.7420436169049724,
+    "cell_lengths_A": [
+      5.565,
+      5.565,
+      5.565
+    ],
+    "cell_angles_deg": [
+      90.0,
+      90.0,
+      90.0
+    ],
+    "volume_per_atom_A3": 21.542967140625013,
+    "pressure_GPa": 1.742043616904974
+  },
+  "phonons": {
+    "supercell": [
+      3,
+      3,
+      3
+    ],
+    "supercell_atoms": 216,
+    "displacements": 2,
+    "displacement_A": 0.01,
+    "residual_force_eV_per_A": 2.8904287817377305e-15
+  },
+  "time_s": {
+    "relax": 0.19117470000128378,
+    "forces": 2.580674699998781
+  },
+  "device": "cuda",
+  "versions": {
+    "phonopy": "4.6.0",
+    "ase": "3.29.0",
+    "torch": "2.14.0+cu126",
+    "mace-torch": "0.3.16",
+    "numpy": "2.5.3"
+  }
+}

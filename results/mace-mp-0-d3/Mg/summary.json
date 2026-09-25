@@ -1,0 +1,36 @@
+{
+  "model": "mace-mp-0-d3",
+  "material": "Mg",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 2,
+  "max_frequency_THz": 6.965965553591026,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 2.9166783816780897,
+  "S_298_J_K_mol": 32.77932507140229,
+  "Cv_298_J_K_mol": 23.62426580687758,
+  "phonopy_max_rel_diff": 3.487733907614569e-06,
+  "janaf": {
+    "table": "Mg-002",
+    "temperature_range_K": [
+      100.0,
+      600.0
+    ],
+    "S_298_exp": 32.671,
+    "S_298_err": 0.10832507140229097,
+    "Cp_298_exp": 24.869,
+    "Cv_298_vs_Cp_rel_err_pct": -5.005163830963921,
+    "S_mae_J_K_mol": 0.4895098754569741,
+    "Cp_mape_pct": 6.339534326385344,
+    "with_electronic": {
+      "gamma_J_mol_K2": 0.00126,
+      "S_298_err": 0.483994071402293,
+      "S_mae_J_K_mol": 0.43902913801293886,
+      "Cp_mape_pct": 4.796564936766585
+    }
+  }
+}

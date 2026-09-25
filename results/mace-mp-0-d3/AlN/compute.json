@@ -1,0 +1,48 @@
+{
+  "model": "mace-mp-0-d3",
+  "material": "AlN",
+  "relax": {
+    "mode": "relaxed",
+    "converged": true,
+    "steps": 8,
+    "spacegroup": "P6_3mc (186)",
+    "energy_per_atom_eV": -7.705847390958052,
+    "max_force_eV_per_A": 8.895446462995281e-05,
+    "max_stress_GPa": 9.229698144835597e-05,
+    "cell_lengths_A": [
+      3.104801557132502,
+      3.1048015571325016,
+      4.962873659350864
+    ],
+    "cell_angles_deg": [
+      90.0,
+      90.0,
+      120.00000000000001
+    ],
+    "volume_per_atom_A3": 10.357896209415566,
+    "pressure_GPa": 5.728797030312335e-05
+  },
+  "phonons": {
+    "supercell": [
+      4,
+      4,
+      3
+    ],
+    "supercell_atoms": 192,
+    "displacements": 4,
+    "displacement_A": 0.01,
+    "residual_force_eV_per_A": 8.895446464489084e-05
+  },
+  "time_s": {
+    "relax": 0.40736159999869415,
+    "forces": 4.46673329999976
+  },
+  "device": "cuda",
+  "versions": {
+    "phonopy": "4.6.0",
+    "ase": "3.29.0",
+    "torch": "2.14.0+cu126",
+    "mace-torch": "0.3.16",
+    "numpy": "2.5.3"
+  }
+}

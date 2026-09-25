@@ -1,0 +1,30 @@
+{
+  "model": "mace-mp-0-d3",
+  "material": "NaCl",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 1,
+  "max_frequency_THz": 7.0776412886405415,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 5.382043620641275,
+  "S_298_J_K_mol": 70.10992068374628,
+  "Cv_298_J_K_mol": 47.58824528445531,
+  "phonopy_max_rel_diff": 3.4699442811643198e-06,
+  "janaf": {
+    "table": "Cl-053",
+    "temperature_range_K": [
+      100.0,
+      700.0
+    ],
+    "S_298_exp": 72.115,
+    "S_298_err": -2.0050793162537133,
+    "Cp_298_exp": 50.509,
+    "Cv_298_vs_Cp_rel_err_pct": -5.782642134163596,
+    "S_mae_J_K_mol": 2.879712565067185,
+    "Cp_mape_pct": 7.379527641598088
+  }
+}

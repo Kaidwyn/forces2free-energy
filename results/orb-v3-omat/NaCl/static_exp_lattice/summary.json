@@ -1,0 +1,30 @@
+{
+  "model": "orb-v3-omat",
+  "material": "NaCl",
+  "mesh": [
+    20,
+    20,
+    20
+  ],
+  "formula_units_per_primitive_cell": 1,
+  "max_frequency_THz": 7.3938070663055555,
+  "min_frequency_THz": 0.0,
+  "imaginary_modes": 0,
+  "zero_point_energy_kJ_mol": 5.487782053014722,
+  "S_298_J_K_mol": 69.01276744912464,
+  "Cv_298_J_K_mol": 47.50711843915315,
+  "phonopy_max_rel_diff": 3.4645664666790968e-06,
+  "janaf": {
+    "table": "Cl-053",
+    "temperature_range_K": [
+      100.0,
+      700.0
+    ],
+    "S_298_exp": 72.115,
+    "S_298_err": -3.1022325508753568,
+    "Cp_298_exp": 50.509,
+    "Cv_298_vs_Cp_rel_err_pct": -5.943260727487864,
+    "S_mae_J_K_mol": 3.9540470549186884,
+    "Cp_mape_pct": 7.643281566333886
+  }
+}
