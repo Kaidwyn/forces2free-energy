@@ -6,7 +6,7 @@ Computes phonons and thermodynamic properties of crystals with universal machine
 interatomic potentials (uMLIPs) and compares them with NIST-JANAF experimental data.
 Pipeline: relax → phonopy finite displacements → force constants → frequencies on a q-mesh →
 partition function → F, S, Cv → comparison with experiment.
-The roadmap is in the Status section of README.md; stage 1 (Si with four MACE models) is done.
+The roadmap is in the Status section of README.md; stages 1 (Si) and 2 (nine crystals, five potentials) are done.
 
 Language: English for everything in the repository: code, comments, docs, commit messages and
 script output.
@@ -17,8 +17,8 @@ script output.
   not work: matscipy, a MACE dependency, has no 3.14 wheel for Windows.
 - The CUDA build of PyTorch is about 3 GB. If the system drive is short on space, point
   `UV_CACHE_DIR` to another drive.
-- MACE models run in the main environment. MatterSim, SevenNet and others need e3nn ≥ 0.5, which
-  conflicts with MACE's e3nn 0.4.4. They will get their own environment that only runs
+- MACE and ORB models run in the main environment. MatterSim, SevenNet and others need e3nn ≥ 0.5,
+  which conflicts with MACE's e3nn 0.4.4. They will get their own environment that only runs
   `pipeline.compute` and hands `phonopy_params.yaml` to the main environment for analysis.
 - `uv.lock` is the source of truth for versions. **Read the installed phonopy source
   (`.venv/Lib/site-packages/phonopy/`) before writing phonopy code.** The 4.x API differs a lot from
@@ -27,7 +27,11 @@ script output.
 ## Physics and numerics (must follow)
 
 - Phonon calculations run in double precision: MACE with `default_dtype="float64"` (MACE defaults
-  to float32).
+  to float32), ORB with `precision="float64"` and `compile=False` (torch.compile needs Triton, which
+  is not available on Windows).
+- ORB-v3 is not exactly rotation-equivariant, so it gives small forces (up to ~2e-3 eV/Å) where
+  symmetry requires none. Keep `FixSymmetry` in relaxations, the subtraction of the undisplaced
+  supercell's forces, and the symfc symmetrization of force constants.
 - Relaxation: `FixSymmetry` + `FrechetCellFilter`, fmax ≤ 1e-3 eV/Å. The space group must be the
   same before and after.
 - Units: phonopy frequencies are ordinary frequencies ν in THz, not angular frequencies ω = 2πν;
@@ -44,7 +48,8 @@ script output.
 - The harmonic approximation gives Cv; JANAF gives Cp. Say so in every comparison. Stage 3 adds the
   quasi-harmonic approximation and compares Cp with Cp. In phonopy 4.6, `QHAResult` replaces
   `PhonopyQHA`, and QHA results are in eV, Å and K.
-- Comparisons with experiment stop at 0.7 × the melting point.
+- Comparisons with experiment stop at 0.7 × the melting point, taken from the JANAF table. For
+  materials that decompose before melting (SiC, AlN), `compare_up_to` sets an explicit limit.
 
 ## Workflow
 
@@ -62,3 +67,4 @@ script output.
 - Open text files with an explicit `encoding="utf-8"`; the Windows default is not UTF-8.
 - Figure colours are fixed per model by its position in `configs/models.yaml`, and experiment is
   always drawn in black. The shared style is in `src/forces2free/plotting.py`.
+- Record timings only for runs that had the GPU to themselves.

@@ -143,6 +143,89 @@ Continue below in the same format.
 
 ---
 
+## 2026-09-25: stage 2 (nine crystals, five potentials)
+
+### 13. A dependency conflict that did not exist
+
+- **What happened**: the plan for stage 2 said that ORB-v3 conflicts with MACE and needs its own
+  environment. That was a confusion with MatterSim and SevenNet, which need e3nn ≥ 0.5.
+- **How it was found**: reading orb-models' dependency declaration on PyPI before installing:
+  it does not depend on e3nn at all.
+- **What was done**: orb-models 0.7.0 was added to the main environment; the resolver kept torch
+  2.14, mace-torch 0.3.16 and e3nn 0.4.4 unchanged.
+- **Lesson**: check a dependency claim against the package metadata before designing around it.
+
+### 14. The orb-models 0.7 API differs from older examples
+
+- **What happened**: in orb-models 0.7 a pretrained loader returns a pair (model, atoms adapter),
+  and `ORBCalculator` needs both; older examples pass a single model. The loaders also compile the
+  model with `torch.compile` by default, which needs Triton, and Triton is not available on Windows.
+- **How it was found**: reading `orb_models/forcefield/pretrained.py` and
+  `inference/calculator.py` before writing the loader.
+- **What was done**: `models.load_calculator` unpacks the pair and passes `compile=False` and
+  `precision="float64"`.
+
+### 15. ORB-v3 predicts forces on a perfect crystal where symmetry requires none
+
+- **What happened**: on a perfect 216-atom silicon supercell, where every force must vanish by
+  symmetry, ORB-v3 gave forces up to 7.6×10⁻⁴ eV/Å; the MACE models give about 10⁻¹⁴ eV/Å. Force
+  differences of about 10⁻³ eV/Å are what phonons are computed from.
+- **How it was found**: a single-point test before the production runs.
+- **What was done**: the neighbour search was ruled out first (the exact brute-force search gives
+  the same 7.6×10⁻⁴). A rotation test then showed the cause: rotating a rattled supercell changes
+  the rotated-back ORB forces by 1.8×10⁻³ eV/Å and the energy by 3 meV, while for MACE the changes
+  are 6×10⁻¹⁴ eV/Å and zero. ORB learns rotational symmetry from data instead of building it in.
+  The workflow already limits the effect: relaxation runs under `FixSymmetry`, the residual forces of
+  the perfect supercell are subtracted, and the force constants are symmetrized with the symfc
+  projector.
+- **Lesson**: architectural symmetry is a property to test, not assume, before using forces from a
+  model for finite differences.
+
+### 16. Two materials have no melting point in JANAF
+
+- **What happened**: the comparison range is 0.7 × the melting point, but the JANAF tables of SiC
+  and AlN list no melting; both decompose first.
+- **What was done**: instead of filling in a decomposition temperature from memory, the
+  configuration sets an explicit comparison limit of 1500 K for these two, with the reason stated.
+  All other melting points now come from the JANAF tables themselves (Si: 1685 K instead of the
+  1687 K used before; the compared temperatures did not change).
+
+### 17. MACE-MATPES-PBE-0 gives MgO an entropy 54 % too high: a workflow error or the model?
+
+- **What happened**: for MgO, MACE-MATPES-PBE-0 gave S(298 K) = 41.6 J/(K·mol) against the
+  experimental 26.9, with a lattice constant of 4.163 Å, smaller than experiment (4.212 Å), yet the
+  softest phonons of all models. A smaller lattice with softer phonons is physically suspicious.
+- **How it was found**: in the table of entropy errors after the production runs.
+- **What was done**: two explanations were tested. First, a fine-tuned MACE model can carry several
+  output heads, and the calculator might use the wrong one; all three MACE-OMAT-0-based models turned
+  out to have a single head. Second, the relaxation could have stopped at a wrong point; a scan of the
+  energy against the lattice constant puts the minimum at 4.165 Å, matching the relaxation, with a
+  bulk modulus of 106 GPa against 153 GPa (MACE-OMAT-0) and 163 GPa (MACE-MATPES-r2SCAN-0). The
+  deviation therefore comes from the model's energy surface and is reported as a result.
+- **Lesson**: before reporting a large deviation as a property of a model, check the two things the
+  workflow could have got wrong: which model output was used, and whether the structure is really at
+  the model's minimum.
+
+### 18. A timing distorted by a concurrent job
+
+- **What happened**: `compute.json` recorded 1966 s for the ORB-v3 forces of MgO, against 3–55 s for
+  every other run.
+- **How it was found**: while reading the run log.
+- **What was done**: the energy scan of entry 17 had been running on the same GPU at the same time.
+  The MgO calculation was repeated alone: 15 s, with identical results, and the record was replaced.
+- **Lesson**: do not run timing-sensitive jobs side by side on one GPU.
+
+### 19. Overwriting a figure failed on Windows
+
+- **What happened**: `savefig` failed with `OSError: [Errno 22] Invalid argument` for a PNG that
+  already existed, and the failure moved from one file to another between attempts.
+- **How it was found**: the figure script stopped with the error.
+- **What was done**: Windows lets another process (an image viewer, the thumbnail cache, a virus
+  scanner) hold a file open for a moment. Figures are now written to a temporary file and swapped in
+  with `os.replace`, retried for up to 10 s.
+
+---
+
 ## Later entries
 
 (Continue here: what happened, how it was found, what was done, lesson.)
