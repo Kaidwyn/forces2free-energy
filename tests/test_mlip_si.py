@@ -84,4 +84,4 @@ def test_gamma_optical_mode_agrees_with_frozen_phonon(run):
     phonon.run_qpoints([[0, 0, 0]])
     optical = phonon.qpoints.frequencies[0].max()
     assert frozen == pytest.approx(optical, rel=5e-3)
-    assert json.loads((directory / "summary.json").read_text())["max_frequency_THz"] >= optical - 1e-6
+    assert json.loads((directory / "summary.json").read_text(encoding="utf-8"))["max_frequency_THz"] >= optical - 1e-6
