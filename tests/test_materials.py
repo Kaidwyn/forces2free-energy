@@ -47,3 +47,25 @@ def test_comparison_range():
     assert materials["SiC"].compare_tmax == 1500  # no melting in JANAF, explicit cap
     assert materials["SiC"].curve_tmax >= materials["SiC"].compare_tmax
     assert materials["Al"].curve_tmax == 1000
+
+
+def test_static_lattice_build():
+    materials = load_materials()
+    with_lattice = {k for k, m in materials.items() if m.static_lattice}
+    assert with_lattice == {"Si", "SiC", "Al", "NaCl", "NaF", "MgO"}
+    for key in with_lattice:
+        material = materials[key]
+        atoms = material.build(a=material.static_lattice["a"])
+        assert atoms.cell.cellpar()[0] == pytest.approx(material.static_lattice["a"])
+        assert spacegroup(atoms) == EXPECTED[key][0]
+        assert "Hao" in material.static_lattice["source"]
+    with pytest.raises(ValueError):
+        materials["Mg"].build(a=3.2)  # hexagonal: one lattice constant is not enough
+    with pytest.raises(ValueError):
+        materials["Al2O3"].build(a=4.8)
+
+
+def test_electronic_gamma_only_for_metals():
+    materials = load_materials()
+    assert {k for k, m in materials.items() if m.gamma_electronic} == {"Al", "Mg"}
+    assert materials["Al"].gamma_electronic == pytest.approx(1.35e-3)  # J/(mol K^2)

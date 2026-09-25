@@ -30,6 +30,12 @@ class Material:
     janaf: str | None
     melting_point: float | None  # K, from the JANAF table; None if it decomposes before melting
     compare_up_to: float | None = None  # K, replaces 0.7 x melting point when set
+    # experimental static-lattice constant (zero-point expansion removed), cubic crystals only:
+    # {"a": angstrom, "source": citation}
+    static_lattice: dict[str, Any] | None = None
+    # Sommerfeld coefficient of the electronic heat capacity, metals only:
+    # {"value": mJ/(mol K^2), "source": citation}
+    electronic_gamma: dict[str, Any] | None = None
 
     @property
     def atoms_per_formula(self) -> int:
@@ -48,10 +54,23 @@ class Material:
         top = self.melting_point or self.compare_tmax / 0.7
         return math.ceil(top / 100) * 100
 
-    def build(self) -> Atoms:
+    @property
+    def gamma_electronic(self) -> float:
+        """Electronic heat-capacity coefficient in J/(mol K^2), 0 for insulators."""
+        return self.electronic_gamma["value"] / 1000 if self.electronic_gamma else 0.0
+
+    def build(self, a: float | None = None) -> Atoms:
+        """Starting structure; `a` replaces the cubic lattice constant of a "bulk" structure."""
         kind = self.structure["kind"]
         if kind == "bulk":
-            return bulk(**self.structure["args"])
+            args = dict(self.structure["args"])
+            if a is not None:
+                if not args.get("cubic"):
+                    raise ValueError(f"a fixed lattice constant needs a cubic cell, not {self.key}")
+                args["a"] = a
+            return bulk(**args)
+        if a is not None:
+            raise ValueError(f"a fixed lattice constant is only supported for bulk structures, not {self.key}")
         if kind == "crystal":  # from a space group and Wyckoff positions
             return crystal(**self.structure["args"])
         raise ValueError(f"unknown structure kind {kind!r} for {self.key}")
@@ -66,6 +85,7 @@ class Model:
     training_data: str
     functional: str
     license: str
+    dispersion: bool = False  # add Grimme D3(BJ) dispersion (MACE only)
 
 
 def _read_yaml(name: str) -> dict[str, dict[str, Any]]:

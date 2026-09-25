@@ -57,3 +57,23 @@ def relax(atoms: Atoms, calc: Calculator, fmax: float = 1e-3, steps: int = 1000)
         max_stress=float(np.abs(atoms.get_stress()).max() / units.GPa),
         spacegroup=end,
     )
+
+
+def evaluate_fixed(atoms: Atoms, calc: Calculator) -> RelaxResult:
+    """Evaluate a structure without relaxing it, e.g. at an experimental lattice constant.
+
+    Meant for structures whose atomic positions are fixed by symmetry (diamond,
+    zincblende, rocksalt, fcc), so the forces vanish and only the stress is
+    nonzero; it reports the stress the model sees at that lattice constant.
+    """
+    atoms = atoms.copy()
+    atoms.calc = calc
+    return RelaxResult(
+        atoms=atoms,
+        converged=True,
+        steps=0,
+        energy_per_atom=atoms.get_potential_energy() / len(atoms),
+        max_force=float(np.abs(atoms.get_forces()).max()),
+        max_stress=float(np.abs(atoms.get_stress()).max() / units.GPa),
+        spacegroup=spacegroup(atoms),
+    )

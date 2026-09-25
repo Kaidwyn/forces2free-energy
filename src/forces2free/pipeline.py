@@ -22,11 +22,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from ase.calculators.calculator import Calculator
+from ase import units
 from ase.io import write
 
 from forces2free import janaf, phonons
 from forces2free.config import Material, Model, results_dir
-from forces2free.relax import relax
+from forces2free.relax import evaluate_fixed, relax
 from forces2free.thermo import harmonic_thermo
 
 MESH = (20, 20, 20)  # Si: S(298 K) within 0.006 J/(K mol) of a 40^3 mesh (scripts/convergence.py)
@@ -49,13 +50,21 @@ def compute(
     supercell: tuple[int, int, int] | None = None,
     directory: Path | None = None,
     device: str = "",
+    lattice: float | None = None,
 ) -> dict[str, Any]:
+    """Relax (or, with `lattice`, fix the cubic lattice constant) and collect phonon forces."""
     directory = directory or results_dir(model.key, material.key)
     directory.mkdir(parents=True, exist_ok=True)
     supercell = supercell or material.supercell
 
     start = time.perf_counter()
-    relaxed = relax(material.build(), calc)
+    if lattice is None:
+        relaxed = relax(material.build(), calc)
+    else:
+        relaxed = evaluate_fixed(material.build(a=lattice), calc)
+        if relaxed.max_force > 2e-3:
+            raise RuntimeError(f"{material.key}: forces {relaxed.max_force:.1e} eV/A at a fixed lattice; "
+                               "positions are not fixed by symmetry")
     relaxed_at = time.perf_counter()
     phonon, residual = phonons.compute_forces(relaxed.atoms, calc, supercell)
     forces_at = time.perf_counter()
@@ -67,6 +76,7 @@ def compute(
         "model": model.key,
         "material": material.key,
         "relax": {
+            "mode": "relaxed" if lattice is None else f"fixed lattice constant {lattice} A",
             "converged": relaxed.converged,
             "steps": relaxed.steps,
             "spacegroup": relaxed.spacegroup,
@@ -76,6 +86,7 @@ def compute(
             "cell_lengths_A": atoms.cell.cellpar()[:3].tolist(),
             "cell_angles_deg": atoms.cell.cellpar()[3:].tolist(),
             "volume_per_atom_A3": atoms.get_volume() / len(atoms),
+            "pressure_GPa": float(-atoms.get_stress()[:3].mean() / units.GPa),
         },
         "phonons": {
             "supercell": list(supercell),
@@ -152,6 +163,9 @@ def compare_with_janaf(
     Cv (constant volume) is not Cp (constant pressure): Cp - Cv = alpha^2 B V T
     is below 1% for Si but ~10% for soft or ionic solids near 800 K. The
     quasi-harmonic Cp is the planned next step.
+
+    For metals the free-electron term C_el = S_el = gamma T (experimental
+    gamma) is also reported, added to the phonon values, in the *_el columns.
     """
     exp = janaf.load(material.janaf)
     exp = exp[(exp.temperature >= 100) & (exp.temperature <= material.compare_tmax) & (exp.note == "")]
@@ -167,10 +181,14 @@ def compare_with_janaf(
     )
     table["Cp_rel_err_pct"] = 100 * (table.Cv_model / table.Cp_exp - 1)
     table["S_err_J_K_mol"] = table.S_model - table.S_exp
+    if material.gamma_electronic:
+        electronic = material.gamma_electronic * table.temperature_K
+        table["Cp_rel_err_pct_el"] = 100 * ((table.Cv_model + electronic) / table.Cp_exp - 1)
+        table["S_err_J_K_mol_el"] = table.S_model + electronic - table.S_exp
     table.to_csv(directory / "comparison_janaf.csv", index=False, float_format="%.6g")
 
     room = table[table.temperature_K == ROOM_TEMPERATURE].iloc[0]
-    return {
+    result = {
         "table": material.janaf,
         "temperature_range_K": [float(table.temperature_K.min()), float(table.temperature_K.max())],
         "S_298_exp": float(room.S_exp),
@@ -180,3 +198,11 @@ def compare_with_janaf(
         "S_mae_J_K_mol": float(table.S_err_J_K_mol.abs().mean()),
         "Cp_mape_pct": float(table.Cp_rel_err_pct.abs().mean()),
     }
+    if material.gamma_electronic:
+        result["with_electronic"] = {
+            "gamma_J_mol_K2": material.gamma_electronic,
+            "S_298_err": float(room.S_err_J_K_mol_el),
+            "S_mae_J_K_mol": float(table.S_err_J_K_mol_el.abs().mean()),
+            "Cp_mape_pct": float(table.Cp_rel_err_pct_el.abs().mean()),
+        }
+    return result

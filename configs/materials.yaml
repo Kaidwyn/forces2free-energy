@@ -12,6 +12,12 @@
 #                 above which anharmonic effects that phonons miss grow large.
 # compare_up_to:  K, replaces 0.7 x melting point for materials whose JANAF
 #                 table lists no melting (they decompose first).
+# static_lattice:   experimental lattice constant with the zero-point anharmonic expansion
+#                   removed, i.e. the static-lattice value a harmonic calculation should reach.
+#                   Only for cubic crystals, from one source. Used to split errors into a
+#                   geometry part and a force-constant part (scripts/run_all.py --static-exp-lattice).
+# electronic_gamma: Sommerfeld coefficient of the electronic heat capacity of metals,
+#                   C_el = S_el = gamma T, in mJ/(mol K^2).
 
 Si:
   name: silicon (diamond)
@@ -23,6 +29,7 @@ Si:
   supercell: [3, 3, 3]
   janaf: Si-001
   melting_point: 1685
+  static_lattice: {a: 5.422, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
 
 SiC:
   name: silicon carbide (3C, zincblende)
@@ -34,6 +41,7 @@ SiC:
   janaf: C-101
   melting_point: null
   compare_up_to: 1500
+  static_lattice: {a: 4.348, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
 
 AlN:
   name: aluminum nitride (wurtzite)
@@ -56,6 +64,8 @@ Al:
   supercell: [4, 4, 4]
   janaf: Al-002
   melting_point: 933.45
+  static_lattice: {a: 4.019, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
+  electronic_gamma: {value: 1.35, source: "Kittel, Introduction to Solid State Physics, 8th ed. (2005), ch. 6; Phillips, Phys. Rev. 114, 676 (1959)"}
 
 Mg:
   name: magnesium (hcp)
@@ -66,6 +76,7 @@ Mg:
   supercell: [5, 5, 3]  # 150 atoms
   janaf: Mg-002
   melting_point: 923
+  electronic_gamma: {value: 1.26, source: "Kittel, Introduction to Solid State Physics, 8th ed. (2005), ch. 6, as tabulated by the KnowledgeDoor Elements Handbook"}
 
 NaCl:
   name: sodium chloride (rocksalt)
@@ -77,6 +88,7 @@ NaCl:
   supercell: [3, 3, 3]
   janaf: Cl-053
   melting_point: 1073.8
+  static_lattice: {a: 5.565, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
 
 NaF:
   name: sodium fluoride (rocksalt)
@@ -87,6 +99,7 @@ NaF:
   supercell: [3, 3, 3]  # 216 atoms
   janaf: F-033
   melting_point: 1269
+  static_lattice: {a: 4.57, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
 
 MgO:
   name: magnesium oxide (rocksalt)
@@ -97,6 +110,7 @@ MgO:
   supercell: [3, 3, 3]  # 216 atoms
   janaf: Mg-008
   melting_point: 3105
+  static_lattice: {a: 4.188, source: "Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, 'Expt. a - Delta'"}
 
 Al2O3:
   name: alpha-alumina (corundum)
