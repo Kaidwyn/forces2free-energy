@@ -8,6 +8,8 @@ always drawn in ink so it never competes with a model for a hue.
 
 from __future__ import annotations
 
+import math
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -86,6 +88,8 @@ def header(fig: plt.Figure, title: str, subtitle: str, handles: list) -> float:
     fig.text(0.01, below_top(0.45), subtitle, ha="left", va="top", fontsize=10, color=INK_SECONDARY)
     if not handles:
         return below_top(0.8)
-    fig.legend(handles=handles, loc="upper left", ncol=len(handles), bbox_to_anchor=(0.005, below_top(0.7)),
+    ncol = len(handles) if len(handles) <= 6 else math.ceil(len(handles) / 2)
+    rows = math.ceil(len(handles) / ncol)
+    fig.legend(handles=handles, loc="upper left", ncol=ncol, bbox_to_anchor=(0.005, below_top(0.7)),
                handlelength=1.6, columnspacing=1.4)
-    return below_top(1.25)
+    return below_top(1.25 + 0.3 * (rows - 1))

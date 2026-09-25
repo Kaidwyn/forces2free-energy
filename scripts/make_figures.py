@@ -263,8 +263,15 @@ def entropy_heatmap(models, materials) -> None:
             ax.text(j, i, f"{errors[i, j]:+.1f}".replace("-", "−"), ha="center", va="center", color=ink, fontsize=10)
 
     mae = np.abs(errors).mean(axis=0)
-    ax.set_xticks(range(len(models)), [f"{m.label}\nmean |error| {e:.1f} %" for m, e in zip(models, mae)],
-                  fontsize=8.5)
+    def two_lines(label: str) -> str:  # so that neighbouring column headers do not collide
+        if " + " in label:
+            return label.replace(" + ", "\n+ ")
+        if label.startswith("MACE-MATPES-"):
+            return label.replace("MATPES-", "MATPES-\n")
+        return f"{label}\n"
+
+    ax.set_xticks(range(len(models)),
+                  [f"{two_lines(m.label)}\nmean |error| {e:.1f} %" for m, e in zip(models, mae)], fontsize=8.5)
     ax.set_yticks(range(len(keys)), [_panel_title(materials[k]) for k in keys], fontsize=9.5)
     ax.xaxis.tick_top()
     ax.grid(False)
@@ -290,6 +297,57 @@ def entropy_heatmap(models, materials) -> None:
     _save(fig, "entropy_errors_298K.png")
 
 
+def _entropy_error_pct(directory) -> float:
+    janaf = json.loads((directory / "summary.json").read_text(encoding="utf-8"))["janaf"]
+    return 100 * janaf["S_298_err"] / janaf["S_298_exp"]
+
+
+def geometry_decomposition(models, colors, materials) -> None:
+    """S(298 K) error at the model's own lattice constant (open) and at the
+    experimental static-lattice constant (filled). The shift between the two is
+    the part of the error caused by the lattice constant; what remains at the
+    experimental lattice comes from the force constants themselves."""
+    keys = [k for k, m in materials.items() if m.static_lattice]
+    fig, ax = plt.subplots(figsize=(10, 6.0))
+    width = 0.8 / len(models)
+    for i, key in enumerate(keys):
+        for j, model in enumerate(models):
+            x = i - 0.4 + (j + 0.5) * width
+            own = _entropy_error_pct(results_dir(model.key, key))
+            fixed = _entropy_error_pct(results_dir(model.key, key) / "static_exp_lattice")
+            color = colors[model.key]
+            ax.plot([x, x], [own, fixed], color=color, linewidth=1.6, zorder=2)
+            ax.plot(x, own, marker="o", markersize=7, markerfacecolor=SURFACE, markeredgecolor=color,
+                    markeredgewidth=1.8, linestyle="none", zorder=3)
+            ax.plot(x, fixed, marker="o", markersize=7, markerfacecolor=color, markeredgecolor=SURFACE,
+                    markeredgewidth=1.2, linestyle="none", zorder=4)
+    ax.axhline(0, color=MUTED, linewidth=0.9, zorder=1)
+    for i in range(1, len(keys)):
+        ax.axvline(i - 0.5, color=GRID, linewidth=0.8, zorder=0)
+    ax.grid(False, axis="x")
+    ax.set_xticks(range(len(keys)), [_panel_title(materials[k]) for k in keys], fontsize=9.5)
+    ax.set_xlim(-0.5, len(keys) - 0.5)
+    ax.set_ylabel("S(model) / S(experiment) − 1 at 298 K  (%)")
+    ax.yaxis.set_major_formatter(lambda v, _: f"{v:+.0f}".replace("-", "−") if v else "0")
+
+    handles = [Line2D([], [], color=colors[m.key], label=m.label) for m in models]
+    handles.append(Line2D([], [], marker="o", markersize=7, markerfacecolor=SURFACE, markeredgecolor=INK_SECONDARY,
+                          markeredgewidth=1.8, linestyle="none", label="own lattice"))
+    handles.append(Line2D([], [], marker="o", markersize=7, markerfacecolor=INK_SECONDARY, markeredgecolor=SURFACE,
+                          linestyle="none", label="experimental lattice"))
+    top = header(
+        fig,
+        "Where the entropy error comes from: lattice constant vs force constants",
+        "Open: at the model's own equilibrium lattice. Filled: at the experimental static-lattice constant "
+        "(Hao et al., 2012). The gap is the geometry part.",
+        handles[:len(models)],
+    )
+    fig.legend(handles=handles[len(models):], loc="upper left", ncol=2, bbox_to_anchor=(0.005, 1 - 1.02 / 6.0),
+               handlelength=1.2, columnspacing=1.4)
+    fig.subplots_adjust(left=0.09, right=0.98, bottom=0.08, top=top - 0.06)
+    _save(fig, "entropy_error_decomposition.png")
+
+
 def main() -> None:
     apply_style()
     FIGURES.mkdir(exist_ok=True)
@@ -306,6 +364,10 @@ def main() -> None:
     models = [m for m in all_models.values() if all(done(m, k) for k in materials)]
     heat_capacity_all(models, colors, materials)
     entropy_heatmap(models, materials)
+    decomposed = [m for m in models
+                  if all((results_dir(m.key, k) / "static_exp_lattice" / "summary.json").exists()
+                         for k, mat in materials.items() if mat.static_lattice)]
+    geometry_decomposition(decomposed, colors, materials)
     print(f"figures written to {FIGURES}")
 
 
