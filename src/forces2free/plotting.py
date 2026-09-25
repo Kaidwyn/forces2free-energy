@@ -20,6 +20,10 @@ MUTED = "#898781"
 GRID = "#e1e0d9"
 AXIS = "#c3c2b7"
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
+# diverging scale for signed errors: blue (too low) - grey (zero) - red (too high)
+NEGATIVE = "#2a78d6"
+NEUTRAL = "#f0efec"
+POSITIVE = "#e34948"
 
 
 def apply_style() -> None:
@@ -80,6 +84,8 @@ def header(fig: plt.Figure, title: str, subtitle: str, handles: list) -> float:
 
     fig.text(0.01, below_top(0.12), title, ha="left", va="top", fontsize=13, fontweight="bold", color=INK)
     fig.text(0.01, below_top(0.45), subtitle, ha="left", va="top", fontsize=10, color=INK_SECONDARY)
+    if not handles:
+        return below_top(0.8)
     fig.legend(handles=handles, loc="upper left", ncol=len(handles), bbox_to_anchor=(0.005, below_top(0.7)),
-               handlelength=1.6)
+               handlelength=1.6, columnspacing=1.4)
     return below_top(1.25)
