@@ -226,6 +226,47 @@ Continue below in the same format.
 
 ---
 
+## 2026-09-25: related work and error decomposition
+
+### 20. A closer prior study was missing from the README
+
+- **What happened**: the README said that uMLIP benchmarks use DFT as the reference and that the
+  agreement with experimental thermodynamic data is "less well established". A review of the
+  repository pointed to Fromsejer et al., Comput. Mater. Sci. 252, 113770 (2025), which compares
+  harmonic and quasi-harmonic Gibbs energies from MACE-MP-0 and ORB-d3-v2 directly with NIST-JANAF,
+  for 147–266 compounds from 100 to 2500 K.
+- **How it was found**: an external review; the paper was then read in full to check the claim.
+  The review overstated one number: the 784 compounds of that study are a 298 K dataset, not the
+  temperature-dependent comparison.
+- **What was done**: the README now cites the study and states what differs here: models trained on
+  newer data (OMat24, MatPES), controlled pairs that separate training data, functional and
+  architecture, per-material entropy and heat capacity instead of pooled Gibbs-energy errors, and an
+  explicit split of each error into a lattice-constant part and a force-constant part.
+- **Lesson**: search for the closest prior work before stating what is new, not only for the
+  best-known benchmarks.
+
+### 21. Following up two findings of that study
+
+- **D3 dispersion.** Fromsejer et al. ran MACE-MP-0 with D3 dispersion and report that it markedly
+  improves the thermodynamics. MACE-MP-0 was therefore also run with D3(BJ) (`mace-mp-0-d3`).
+- **Quasi-harmonic vs harmonic.** They find that, with MACE, the quasi-harmonic approximation is not
+  more accurate than the harmonic one, possibly because the potential is less reliable away from
+  equilibrium. Stage 3 will treat this as a question to test rather than assume that the
+  quasi-harmonic Cp closes the high-temperature gap.
+
+### 22. Data sources for the decomposition
+
+- The experimental lattice constants must be static-lattice values (zero-point expansion removed),
+  because the harmonic calculation has no zero-point or thermal expansion. They come from one table,
+  Hao et al., Phys. Rev. B 85, 014111 (2012), Table III, which covers only cubic crystals; AlN, Mg and
+  Al₂O₃ are therefore left out of the decomposition rather than mixed with values from other sources.
+- The electronic heat-capacity coefficients of Al (1.35 mJ mol⁻¹ K⁻²) and Mg (1.26) come from
+  Kittel's table; the Al value agrees with the original measurement (Phillips, 1959).
+- The open-access PDFs of both papers downloaded only partly on the first attempts (flaky network);
+  pypdf reported a truncated stream, and the downloads were resumed until the file ended in `%%EOF`.
+
+---
+
 ## Later entries
 
 (Continue here: what happened, how it was found, what was done, lesson.)

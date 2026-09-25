@@ -6,7 +6,7 @@ Computes phonons and thermodynamic properties of crystals with universal machine
 interatomic potentials (uMLIPs) and compares them with NIST-JANAF experimental data.
 Pipeline: relax → phonopy finite displacements → force constants → frequencies on a q-mesh →
 partition function → F, S, Cv → comparison with experiment.
-The roadmap is in the Status section of README.md; stages 1 (Si) and 2 (nine crystals, five potentials) are done.
+The roadmap is in the Status section of README.md; stages 1 (Si) and 2 (nine crystals, five potentials) and the error decomposition are done.
 
 Language: English for everything in the repository: code, comments, docs, commit messages and
 script output.
@@ -48,6 +48,14 @@ script output.
 - The harmonic approximation gives Cv; JANAF gives Cp. Say so in every comparison. Stage 3 adds the
   quasi-harmonic approximation and compares Cp with Cp. In phonopy 4.6, `QHAResult` replaces
   `PhonopyQHA`, and QHA results are in eV, Å and K.
+- To separate geometry from force constants, compare with the experimental **static-lattice**
+  constant (zero-point expansion removed), never the room-temperature one: the harmonic calculation
+  has neither zero-point nor thermal expansion. Take all such values from one source (Hao et al.,
+  2012); do not mix sources.
+- The electronic term of metals, C_el = S_el = γT, is reported separately (`*_el` columns) and never
+  folded into the phonon-only numbers.
+- D3 dispersion (`dispersion: true`) is a model variant with its own key, so its results never
+  overwrite those of the base model.
 - Comparisons with experiment stop at 0.7 × the melting point, taken from the JANAF table. For
   materials that decompose before melting (SiC, AlN), `compare_up_to` sets an explicit limit.
 
